@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>A.I.M. Merc Explorer</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --bg:#0b0d10; --panel:#1a1e24; --panel2:#22272f; --edge-hi:#5b6470; --edge-lo:#050607;
+  --gold:#d9b04a; --gold-d:#8f7128; --text:#c9cdd3; --dim:#7d8590;
+  --love:#5ec46a; --like:#9bd06b; --dislike:#e0a04a; --hate:#e5534b;
+  --bar-bg:#0a0c0e;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg) radial-gradient(ellipse at 50% -10%,#1b2430 0,#0b0d10 60%) fixed;color:var(--text);
+  font:14px/1.35 "Trebuchet MS","Segoe UI",Arial,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+.bevel{border:2px solid;border-color:var(--edge-hi) var(--edge-lo) var(--edge-lo) var(--edge-hi);background:var(--panel)}
+.inset{border:2px solid;border-color:var(--edge-lo) var(--edge-hi) var(--edge-hi) var(--edge-lo);background:var(--bar-bg)}
+header{padding:10px 18px;display:flex;align-items:center;gap:16px;border-bottom:2px solid var(--gold-d);
+  background:linear-gradient(#20262e,#12161b)}
+header h1{margin:0;font:700 22px/1 Georgia,"Times New Roman",serif;letter-spacing:.14em;color:var(--gold);text-shadow:0 2px 0 #000}
+header h1 small{display:block;font:11px/1.4 "Trebuchet MS",sans-serif;letter-spacing:.3em;color:var(--dim);margin-top:4px}
+header .sp{flex:1}
+#count{color:var(--dim);font-size:12px;letter-spacing:.1em}
+main{flex:1;display:grid;grid-template-columns:280px 1fr;gap:10px;padding:10px;min-height:0}
+#listPane{display:flex;flex-direction:column;min-height:0}
+#tools{padding:8px;display:grid;gap:6px}
+#tools input,#tools select{width:100%;background:var(--bar-bg);color:var(--text);border:2px solid;border-color:var(--edge-lo) var(--edge-hi) var(--edge-hi) var(--edge-lo);padding:5px 7px;font:inherit}
+.tabs{display:flex;gap:4px}
+.btn{flex:1;text-align:center;padding:5px 4px;cursor:pointer;user-select:none;background:var(--panel2);color:var(--dim);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+  border:2px solid;border-color:var(--edge-hi) var(--edge-lo) var(--edge-lo) var(--edge-hi)}
+.btn:hover{color:var(--text)}
+.btn.on{color:var(--gold);background:#12161b;border-color:var(--edge-lo) var(--edge-hi) var(--edge-hi) var(--edge-lo)}
+#list{flex:1;overflow:auto;margin-top:6px;padding:4px}
+.row{display:grid;grid-template-columns:52px 1fr auto;gap:8px;align-items:center;padding:4px;cursor:pointer;border:1px solid transparent}
+.row:hover{background:#1f252d;border-color:var(--gold-d)}
+.row.sel{background:#2a2414;border-color:var(--gold)}
+.row img{width:52px;height:56px;object-fit:cover;object-position:top;background:#000;border:1px solid #000;outline:1px solid var(--edge-hi)}
+.row .nm{color:var(--gold);font-weight:700;letter-spacing:.04em}
+.row .sub{font-size:11px;color:var(--dim)}
+.row .rt{text-align:right;font-size:12px}
+.row .rt b{color:#fff}
+.dots{display:flex;gap:3px;justify-content:flex-end;margin-top:3px;min-height:8px}
+.dot{width:8px;height:8px;border-radius:50%;box-shadow:0 0 4px currentColor}
+.d-love{background:var(--love);color:var(--love)}.d-hate{background:var(--hate);color:var(--hate)}
+#detail{overflow:auto;padding:16px 20px;min-height:0}
+.empty{color:var(--dim);text-align:center;margin-top:20vh;letter-spacing:.2em}
+.top{display:grid;grid-template-columns:auto 1fr;gap:20px}
+.portrait{width:212px;height:244px;border:3px solid;border-color:var(--edge-lo) var(--edge-hi) var(--edge-hi) var(--edge-lo);background:#000;box-shadow:0 0 0 2px var(--gold-d)}
+.portrait img{width:100%;height:100%;object-fit:cover;display:block}
+h2{margin:0;font:700 30px/1.1 Georgia,serif;color:var(--gold);letter-spacing:.06em;text-shadow:0 2px 0 #000}
+.full{color:var(--dim);margin:2px 0 10px;letter-spacing:.06em}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chip{padding:3px 9px;font-size:12px;letter-spacing:.05em;background:var(--panel2);border:1px solid var(--edge-hi);color:var(--text)}
+.chip.gold{color:var(--gold);border-color:var(--gold-d)}
+.chip.warn{color:#e5a4a0;border-color:#7a3a35}
+.cost{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:10px;width:max-content;max-width:100%;padding:8px 14px}
+.cost div span{display:block;font-size:10px;color:var(--dim);letter-spacing:.14em;text-transform:uppercase}
+.cost div b{font-size:16px;color:#fff;font-weight:600}
+h3{margin:22px 0 8px;font:700 13px/1 "Trebuchet MS",sans-serif;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--gold-d);padding-bottom:6px}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px 26px}
+.stat{display:grid;grid-template-columns:110px 1fr 34px;align-items:center;gap:8px}
+.stat label{font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.stat .bar{height:12px;position:relative}
+.stat .bar i{position:absolute;inset:0 auto 0 0;display:block}
+.stat .bar u{position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 9px,rgba(0,0,0,.55) 9px 10px)}
+.stat b{text-align:right;font-variant-numeric:tabular-nums}
+.rel-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.rel-head .sl{display:flex;align-items:center;gap:8px;color:var(--dim);font-size:12px;letter-spacing:.06em}
+.rel-head input{accent-color:var(--gold)}
+.grp{margin:14px 0 6px;font-size:12px;letter-spacing:.2em;text-transform:uppercase}
+.grp.love{color:var(--love)}.grp.like{color:var(--like)}.grp.dislike{color:var(--dislike)}.grp.hate{color:var(--hate)}
+.cards{display:flex;flex-wrap:wrap;gap:8px}
+.rc{position:relative;width:92px;cursor:pointer;background:var(--panel2);border:2px solid var(--c,#555);padding:0;text-align:center}
+.rc:hover{transform:translateY(-2px);background:#2b323c}
+.rc img{width:100%;height:82px;object-fit:cover;object-position:top;display:block;background:#000}
+.rc .n{font-size:12px;padding:3px 2px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc .v{position:absolute;top:2px;left:2px;background:rgba(0,0,0,.85);color:var(--c);font-weight:700;font-size:12px;padding:0 5px;border:1px solid var(--c)}
+.rc .back{position:absolute;top:2px;right:2px;font-size:11px;background:rgba(0,0,0,.85);padding:0 4px;color:var(--c);border:1px solid var(--c)}
+.rc.buddy,.rc.hated{box-shadow:0 0 12px var(--c);border-width:3px}
+.rc.buddy::after,.rc.hated::after{content:attr(data-tag);position:absolute;left:0;right:0;top:60px;background:var(--c);color:#000;font:700 10px/1.5 sans-serif;letter-spacing:.2em}
+.legend{color:var(--dim);font-size:12px;margin-top:8px}
+.note{margin-top:10px;padding:8px 12px;border-left:3px solid var(--c);background:rgba(255,255,255,.03);font-size:13px}
+.none{color:var(--dim);font-size:13px;font-style:italic}
+::-webkit-scrollbar{width:12px;height:12px}::-webkit-scrollbar-track{background:#08090b}::-webkit-scrollbar-thumb{background:#3a424d;border:2px solid;border-color:var(--edge-hi) var(--edge-lo) var(--edge-lo) var(--edge-hi)}
+@media(max-width:820px){main{grid-template-columns:1fr}#listPane{max-height:40vh}.top{grid-template-columns:1fr}}
+</style></head>
+<body>
+<header><h1>A.I.M. <small>ASSOCIATION OF INTERNATIONAL MERCENARIES &middot; MERC EXPLORER</small></h1><div class="sp"></div><div id="count"></div></header>
+<main>
+  <section id="listPane" class="bevel" style="padding:6px">
+    <div id="tools">
+      <input id="q" type="search" placeholder="Search name…" autocomplete="off">
+      <div class="tabs" id="tabs"></div>
+      <select id="skill"></select>
+      <select id="sort"></select>
+    </div>
+    <div id="list" class="inset"></div>
+  </section>
+  <section id="detail" class="bevel"></section>
+</main>
+<script src="data.js"></script>
+<script>
+const M = DATA.mercs, byId = {}; M.forEach(m => byId[m.id] = m);
+const SKILL = {LOCKPICKING:"Lock picking",HANDTOHAND:"Hand to hand",ELECTRONICS:"Electronics",NIGHTOPS:"Night ops",THROWING:"Throwing",TEACHING:"Teaching",HEAVY_WEAPS:"Heavy weapons",AUTO_WEAPS:"Auto weapons",STEALTHY:"Stealthy",AMBIDEXT:"Ambidextrous",THIEF:"Thief",MARTIALARTS:"Martial arts",KNIFING:"Knifing",ONROOF:"Rooftop sniping",CAMOUFLAGED:"Camouflaged"};
+const PERS = {HEAT_INTOLERANT:"Heat intolerant",NERVOUS:"Nervous",CLAUSTROPHOBIC:"Claustrophobic",NONSWIMMER:"Can't swim",FEAR_OF_INSECTS:"Fear of insects",FORGETFUL:"Forgetful",PSYCHO:"Psycho"};
+const ATT = {NORMAL:"Normal",FRIENDLY:"Friendly",LONER:"Loner",OPTIMIST:"Optimist",PESSIMIST:"Pessimist",AGGRESSIVE:"Aggressive",ARROGANT:"Arrogant",BIG_SHOT:"Big shot",ASSHOLE:"Asshole",COWARD:"Coward"};
+const TYPE = {AIM:"A.I.M.",MERC:"M.E.R.C.",RPC:"Recruitable"};
+const STATS = [["life","Health"],["agility","Agility"],["dexterity","Dexterity"],["strength","Strength"],["leadership","Leadership"],["wisdom","Wisdom"],["exp","Exp. level"],["marksmanship","Marksmanship"],["mechanical","Mechanical"],["explosive","Explosives"],["medical","Medical"]];
+const $ = id => document.getElementById(id);
+const label = m => m.nick;
+const money = n => "$" + n.toLocaleString("en-US");
+const statColor = v => v >= 85 ? "#5ec46a" : v >= 70 ? "#a3cf5e" : v >= 50 ? "#d9b04a" : v >= 30 ? "#d98a3a" : "#c2554a";
+const st = {skill:"",q:"", tab:"ALL", sort:"name", sel:null, min:3};
+
+const sorts = {id:["Profile order",(a,b)=>a.id-b.id], name:["Name",(a,b)=>label(a).localeCompare(label(b))], salary:["Daily rate (high first)",(a,b)=>b.salary-a.salary],
+  exp:["Experience level",(a,b)=>b.stats.exp-a.stats.exp||b.salary-a.salary]};
+STATS.filter(s=>s[0]!=="exp").forEach(([k,n])=>sorts[k]=[n+" (high first)",(a,b)=>b.stats[k]-a.stats[k]]);
+$("sort").innerHTML = Object.entries(sorts).map(([k,v])=>`<option value="${k}"${k===st.sort?" selected":""}>${v[0]}</option>`).join("");
+$("skill").innerHTML = `<option value="">Any skill</option><option value="EXPERT">Expert (skill twice)</option>` + Object.entries(SKILL).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
+$("tabs").innerHTML = [["ALL","All"],["AIM","A.I.M."],["MERC","M.E.R.C."],["RPC","RPC"]].map(([k,n])=>`<div class="btn" data-t="${k}">${n}</div>`).join("");
+
+const isBuddy=(m,id)=>m.buddy.includes(id), isHated=(m,id)=>m.hated.includes(id);
+function dots(m){
+  return `<div class="dots">${'<span class="dot d-love" title="Has a buddy"></span>'.repeat(m.buddy.length)}${'<span class="dot d-hate" title="Hates someone"></span>'.repeat(m.hated.length)}</div>`;
+}
+function renderList(){
+  const q = st.q.toLowerCase();
+  const rows = M.filter(m=>(st.tab==="ALL"||m.type===st.tab)&&(!q||(m.name+" "+m.nick).toLowerCase().includes(q))&&(!st.skill||(st.skill==="EXPERT"?m.skill1!=="NONE"&&m.skill1===m.skill2:m.skill1===st.skill||m.skill2===st.skill))).sort(sorts[st.sort][1]);
+  $("count").textContent = rows.length + " / " + M.length + " PROFILES";
+  $("list").innerHTML = rows.map(m=>{
+    const key = st.sort in m.stats && st.sort!=="exp" ? `<b>${m.stats[st.sort]}</b> ${STATS.find(s=>s[0]===st.sort)[1]}` : `Lv <b>${m.stats.exp}</b>`;
+    return `<div class="row ${st.sel===m.id?"sel":""}" data-id="${m.id}"><img src="${m.portrait||""}" alt=""><div><div class="nm">${label(m)}</div><div class="sub">${TYPE[m.type]}${m.skill1!=="NONE"?" · "+SKILL[m.skill1]:""}</div></div><div class="rt">${key}<br><span class="sub">${money(m.salary)}/day</span>${dots(m)}</div></div>`}).join("") || `<div class="none" style="padding:14px">No match.</div>`;
+  document.querySelectorAll("#tabs .btn").forEach(b=>b.classList.toggle("on",b.dataset.t===st.tab));
+}
+function card(o,v,cls,tag,back){
+  const c = v>=25?"var(--love)":v>0?"var(--like)":v<=-25?"var(--hate)":"var(--dislike)";
+  return `<div class="rc ${cls||""}" style="--c:${c}" data-id="${o.id}" data-tag="${tag||""}" title="${o.name}: ${v>0?"+":""}${v}">
+    <img src="${o.portrait||""}" alt=""><span class="v">${v>0?"+":""}${v}</span>${back?`<span class="back">${back}</span>`:""}<div class="n">${label(o)}</div></div>`;
+}
+function relBlock(m){
+  const min = st.min;
+  const g = {love:[],like:[],dislike:[],hate:[]};
+  M.filter(o=>o.id!==m.id).forEach(o=>{
+    const v = m.opinion[o.id]||0;
+    const b=isBuddy(m,o.id)||v>=25, h=isHated(m,o.id)||v<=-25;
+    if(!b&&!h&&Math.abs(v)<min) return;
+    const back = o.opinion[m.id]||0, mutual = (v>0&&back>0)||(v<0&&back<0);
+    (b?g.love:h?g.hate:v>0?g.like:g.dislike).push({o,v,b,h,bk:mutual?"⇄":""});
+  });
+  Object.values(g).forEach(a=>a.sort((x,y)=>Math.abs(y.v)-Math.abs(x.v)));
+  const sect=(k,title,arr)=>arr.length?`<div class="grp ${k}">${title} (${arr.length})</div><div class="cards">${arr.map(x=>card(x.o,x.v,x.b?"buddy":x.h?"hated":"",x.b?"BUDDY":x.h?"HATED":"",x.bk)).join("")}</div>`:"";
+  let html = sect("love","♥ Buddies",g.love)+sect("like","Likes",g.like)+sect("dislike","Dislikes",g.dislike)+sect("hate","✖ Hates",g.hate);
+  if(!html) html=`<div class="none">No opinions at or beyond ±${min}.</div>`;
+  const inc = M.filter(o=>o.id!==m.id).map(o=>({o,v:o.opinion[m.id]||0})).filter(x=>Math.abs(x.v)>=Math.max(min,5)).sort((a,b)=>b.v-a.v);
+  const incLike = inc.filter(x=>x.v>0), incHate = inc.filter(x=>x.v<0).reverse();
+  const incHtml = (incLike.length?`<div class="grp like">Who likes ${label(m)}</div><div class="cards">${incLike.map(x=>card(x.o,x.v,x.v>=25?"buddy":"",x.v>=25?"BUDDY":"","")).join("")}</div>`:"")
+    +(incHate.length?`<div class="grp hate">Who dislikes ${label(m)}</div><div class="cards">${incHate.map(x=>card(x.o,x.v,x.v<=-25?"hated":"",x.v<=-25?"HATED":"","")).join("")}</div>`:"");
+  let notes="";
+  if(m.learnToLike>=0&&byId[m.learnToLike]) notes+=`<div class="note" style="--c:var(--love)">Will <b>learn to like</b> ${byId[m.learnToLike].nick} after ${m.learnToLikeTime} days on the same team.</div>`;
+  if(m.learnToHate>=0&&byId[m.learnToHate]) notes+=`<div class="note" style="--c:var(--hate)">Will <b>learn to hate</b> ${byId[m.learnToHate].nick} after ${m.learnToHateTime} days on the same team.</div>`;
+  m.hated.forEach((id,i)=>{ if(byId[id]) notes+=`<div class="note" style="--c:var(--hate)">Complains about <b>${byId[id].nick}</b> and quits after ${m.hatedTime[i]} days on the same team.</div>`; });
+  return `<h3>Relationships</h3>
+    <div class="rel-head"><div class="sl">Show opinions of at least ± <input id="min" type="range" min="1" max="24" value="${min}"> <b id="minv" style="color:var(--gold)">${min}</b></div></div>
+    ${html}${notes}
+    ${incHtml?`<h3>How others feel about ${label(m)}</h3>${incHtml}`:""}`;
+}
+function renderDetail(){
+  const m = byId[st.sel], d = $("detail");
+  if(!m){d.innerHTML=`<div class="empty">SELECT A MERCENARY</div>`;return}
+  const sk = [m.skill1,m.skill2].filter(s=>s!=="NONE");
+  const skHtml = sk.length===2&&sk[0]===sk[1]?`<span class="chip gold">${SKILL[sk[0]]} (expert)</span>`:sk.map(s=>`<span class="chip gold">${SKILL[s]}</span>`).join("")||`<span class="chip">No skills</span>`;
+  const stats = STATS.map(([k,n])=>{const v=m.stats[k], pct=k==="exp"?v*10:v;
+    return `<div class="stat"><label>${n}</label><div class="bar inset"><i style="width:${pct}%;background:${k==="exp"?"#5b8dd9":statColor(v)}"></i><u></u></div><b>${v}</b></div>`}).join("");
+  d.innerHTML = `<div class="top">
+    <div class="portrait">${m.portrait?`<img src="${m.portrait}" alt="">`:""}</div>
+    <div><h2>${m.nick}</h2><div class="full">${m.name}</div>
+      <div class="chips"><span class="chip gold">${TYPE[m.type]}</span><span class="chip">${m.sex==="F"?"Female":"Male"}</span></div>
+      <div class="chips">${skHtml}${m.personality!=="NONE"?`<span class="chip warn">${PERS[m.personality]}</span>`:""}<span class="chip">Attitude: ${ATT[m.attitude]}</span></div>
+      <div class="cost bevel"><div><span>Daily</span><b>${money(m.salary)}</b></div><div><span>Weekly</span><b>${m.weekly?money(m.weekly):"—"}</b></div><div><span>Biweekly</span><b>${m.biweekly?money(m.biweekly):"—"}</b></div><div><span>Med. deposit</span><b>${m.medDeposit?money(m.medDeposit):"none"}</b></div>${m.gearCost?`<div><span>Optional gear</span><b>${money(m.gearCost)}</b></div>`:""}</div>
+    </div></div>
+    <h3>Attributes</h3><div class="stats">${stats}</div>
+    ${relBlock(m)}`;
+  const mn = $("min");
+  mn.oninput = () => { st.min=+mn.value; const y=d.scrollTop; renderDetail(); d.scrollTop=y; $("min").focus(); };
+}
+function select(id,noScroll){
+  st.sel=id; history.replaceState(null,"","#"+id); renderList(); renderDetail(); $("detail").scrollTop=0;
+  const r=document.querySelector("#list .row.sel"); if(r&&!noScroll) r.scrollIntoView({block:"nearest"});
+}
+$("list").onclick = e => { const r=e.target.closest(".row"); if(r) select(+r.dataset.id,true) };
+$("detail").onclick = e => { const r=e.target.closest(".rc"); if(r) select(+r.dataset.id) };
+$("q").oninput = () => { st.q=$("q").value; renderList() };
+$("skill").onchange = () => { st.skill=$("skill").value; renderList() };
+$("sort").onchange = () => { st.sort=$("sort").value; renderList() };
+$("tabs").onclick = e => { const b=e.target.closest(".btn"); if(b){st.tab=b.dataset.t; renderList()} };
+addEventListener("keydown", e => {
+  if(e.target.tagName==="INPUT"&&e.target.type==="search") return;
+  if(e.key!=="ArrowDown"&&e.key!=="ArrowUp") return;
+  const ids=[...document.querySelectorAll("#list .row")].map(r=>+r.dataset.id); if(!ids.length) return;
+  const i=ids.indexOf(st.sel), n=Math.max(0,Math.min(ids.length-1,i+(e.key==="ArrowDown"?1:-1)));
+  e.preventDefault(); select(ids[n]);
+});
+const h=parseInt(location.hash.slice(1)); select(byId[h]?h:M[0].id);
+</script></body></html>

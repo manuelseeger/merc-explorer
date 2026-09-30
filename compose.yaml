@@ -1,0 +1,11 @@
+services:
+  web:
+    build: .
+    expose:
+      - "80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:80/healthz"]
+      interval: 10s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
