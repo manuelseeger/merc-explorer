@@ -6,7 +6,7 @@ ENV SERVER_HOST=0.0.0.0 \
     SERVER_COMPRESSION=true \
     SERVER_CACHE_CONTROL_HEADERS=false
 
-COPY --chown=sws:sws index.html data.js healthz /home/sws/public/
+COPY --chown=sws:sws index.html data.js favicon.svg healthz /home/sws/public/
 
 EXPOSE 80
 HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
