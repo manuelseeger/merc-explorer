@@ -1,5 +1,5 @@
 **
 !Dockerfile
-!nginx.conf
+!healthz
 !index.html
 !data.js
