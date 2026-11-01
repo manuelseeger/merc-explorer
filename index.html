@@ -111,7 +111,7 @@ const $ = id => document.getElementById(id);
 const label = m => m.nick;
 const money = n => "$" + n.toLocaleString("en-US");
 const statColor = v => v >= 85 ? "#5ec46a" : v >= 70 ? "#a3cf5e" : v >= 50 ? "#d9b04a" : v >= 30 ? "#d98a3a" : "#c2554a";
-const st = {skill:"",q:"", tab:"ALL", sort:"name", sel:null, min:3};
+const st = {skill:"",q:"", tab:"ALL", sort:"name", sel:null, min:5};
 
 const sorts = {id:["Profile order",(a,b)=>a.id-b.id], name:["Name",(a,b)=>label(a).localeCompare(label(b))], salary:["Daily rate (high first)",(a,b)=>b.salary-a.salary],
   exp:["Experience level",(a,b)=>b.stats.exp-a.stats.exp||b.salary-a.salary]};
